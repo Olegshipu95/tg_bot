@@ -11,6 +11,10 @@ class Settings(BaseSettings):
 
     google_credentials_file: str
 
+    ADMIN_ID: str
+
+    max_users: int
+
     model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')
 
 

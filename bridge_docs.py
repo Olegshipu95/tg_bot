@@ -1,7 +1,7 @@
 import gspread
 from config_reader import config
 
-COLUMN_TITLES = ['Name', 'Username', 'Phone', 'English Level', 'Registration Time', 'Payment']
+COLUMN_TITLES = ['Name', 'Username', 'Phone', 'English Level', 'Registration Time', 'chat_id', 'Payment']
 gc = gspread.service_account(filename=config.google_credentials_file)
 sheet = gc.open(config.google_sheet_name).sheet1
 
@@ -9,6 +9,14 @@ sheet = gc.open(config.google_sheet_name).sheet1
 def check_user_exists(username):
     existing_records = sheet.get_all_records()
     return any(record.get('Username') == f"@{username}" for record in existing_records)
+
+
+def check_user_data(username):
+    existing_records = sheet.get_all_records()
+    for record in existing_records:
+        if record.get('Username') == f"@{username}":
+            return record
+    return None
 
 
 def check_and_add_headers():
@@ -24,6 +32,7 @@ def save_user_data_to_sheet(user_data):
         user_data.get('phone'),
         user_data.get('english_level'),
         user_data.get('registration_time'),
+        user_data.get('chat_id'),
         user_data.get('Payment', 'NO')
     ]
     sheet.append_row(row)
@@ -49,10 +58,7 @@ def update_payment_status(username):
             sheet.update_cell(row_number, COLUMN_TITLES.index('Payment') + 1, 'TRUE')
             break
 
-
-def check_user_data(username):
+def count_paid_users():
     existing_records = sheet.get_all_records()
-    for record in existing_records:
-        if record.get('Username') == f"@{username}":
-            return record
-    return None
+    paid_users = [record for record in existing_records if record.get('Payment') == 'TRUE']
+    return len(paid_users)

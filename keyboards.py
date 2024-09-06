@@ -21,6 +21,7 @@ confirmation_keyboard = ReplyKeyboardMarkup(
 start_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="/start")],
+        [KeyboardButton(text="/myself")],
         [KeyboardButton(text="/register")],
         [KeyboardButton(text="/pay")]
     ],
