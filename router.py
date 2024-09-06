@@ -8,18 +8,13 @@ from aiogram import Router
 from aiogram.fsm.storage.memory import MemoryStorage
 from datetime import datetime
 
-from aiogram.utils.chat_member import ADMINS
-from aiohttp.web_fileresponse import content_type
-
 from bridge_docs import *
 from keyboards import *
 from payment import initiate_payment
 from config_reader import config
 from enums import *
 
-
 logging.basicConfig(level=logging.INFO)
-
 
 bot = Bot(token=config.bot_token.get_secret_value())
 dp = Dispatcher(storage=MemoryStorage())
@@ -38,6 +33,7 @@ router = Router()
 admin_user = config.ADMIN_ID
 
 max_users = config.max_users
+
 
 @router.message(Command('start'))
 async def router_cmd_start(message: types.Message):
@@ -87,8 +83,9 @@ async def router_initiate_payment_process(message: types.Message):
 
     total_paid_users = count_paid_users()
 
-    if total_paid_users >= MAX_USERS:
-        await message.answer("Извините, достигнуто максимальное количество участников, которые могут оплатить подписку.")
+    if total_paid_users >= max_users:
+        await message.answer(
+            "Извините, достигнуто максимальное количество участников, которые могут оплатить подписку.")
         return
 
     if user_data['Payment'] == 'TRUE':

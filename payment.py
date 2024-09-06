@@ -5,7 +5,8 @@ from aiogram.types import LabeledPrice
 
 PRICE = LabeledPrice(label="Подписка на 1 месяц", amount=10000)  # amount в копейках
 
-async def initiate_payment(message: types.Message, bot : Bot):
+
+async def initiate_payment(message: types.Message, bot: Bot):
     await bot.send_invoice(
         chat_id=message.chat.id,
         title="Подписка на спикинг клуб",

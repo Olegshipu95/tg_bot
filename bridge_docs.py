@@ -58,6 +58,7 @@ def update_payment_status(username):
             sheet.update_cell(row_number, COLUMN_TITLES.index('Payment') + 1, 'TRUE')
             break
 
+
 def count_paid_users():
     existing_records = sheet.get_all_records()
     paid_users = [record for record in existing_records if record.get('Payment') == 'TRUE']
