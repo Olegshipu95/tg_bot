@@ -10,7 +10,7 @@ from datetime import datetime
 
 from bridge_docs import *
 from keyboards import *
-from payment import initiate_payment
+from payment import generate_yoomoney_link, check_payment_status
 from config_reader import config
 from enums import *
 
@@ -49,7 +49,7 @@ async def show_user_info(message: types.Message):
     user_data = check_user_data(username)
 
     if user_data is None:
-        await message.answer("Вы не зарегистрированы в системе. Пожалуйста, используйте команду /register.")
+        await message.answer("Вы не зарегистрированы в системе. Пожалуйста, используйте команду /register")
     else:
         # Формируем ответное сообщение с данными о пользователе
         user_info = (
@@ -92,7 +92,22 @@ async def router_initiate_payment_process(message: types.Message):
         await message.answer("Вы уже оплатили подписку.")
     else:
         await message.answer("Вам необходимо оплатить подписку для участия в спикинг клубе.")
-        await initiate_payment(message, bot)
+        payment_url = generate_yoomoney_link(2, username)
+        await message.answer(
+            f"Перейдите по ссылке для оплаты:\n {payment_url}.\n--------------------------\nВАЖНО! После оплаты необходимо проверить платеж командой /callback")
+
+
+@dp.message(Command("callback"))
+async def process_payment_callback(message: types.Message):
+    username = message.from_user.username
+    user_data = check_user_data(username)
+    if not user_data:
+        await message.answer("Вы не зарегистрированы в системе. Пожалуйста, используйте команду /register")
+    elif check_payment_status(username):
+        update_payment_status(username)
+        await message.answer("Оплата успешно произведена! Добро пожаловать на спикинг клуб!")
+    else:
+        await message.answer("Оплата не была произведена, попробуйте еще раз.")
 
 
 @router.message(Form.name)
@@ -139,22 +154,6 @@ async def router_handle_confirmation(message: types.Message, state: FSMContext):
     elif message.text == Confirmation.NO:
         await message.answer("Ваши данные остались неизменными.", reply_markup=start_keyboard)
     await state.clear()
-
-
-@router.pre_checkout_query()
-async def router_process_pre_checkout_query(pre_checkout_query: types.PreCheckoutQuery):
-    await bot.answer_pre_checkout_query(pre_checkout_query.id, ok=True)
-
-
-@router.message(F.successful_payment)
-async def router_handle_payment(message: types.Message):
-    user_data = check_user_data(message.from_user.username)
-    if user_data:
-        # Обновляем данные пользователя, что зон оплатил подписку
-        update_payment_status(message.from_user.username)
-        await message.answer("Платеж успешно обработан! Спасибо за подписку.")
-    else:
-        await message.answer("Не удалось найти ваши данные. Пожалуйста, зарегистрируйтесь заново.")
 
 
 # Команда /broadcast для отправки сообщений всем пользователям

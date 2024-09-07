@@ -5,13 +5,17 @@ from pydantic import SecretStr
 class Settings(BaseSettings):
     bot_token: SecretStr
 
-    payments_token: SecretStr
-
     google_sheet_name: str
 
     google_credentials_file: str
 
     ADMIN_ID: str
+
+    yoomoney_client: SecretStr
+
+    yoomoney_client_secret: SecretStr
+
+    yoomoney_token: SecretStr
 
     max_users: int
 

@@ -23,7 +23,8 @@ start_keyboard = ReplyKeyboardMarkup(
         [KeyboardButton(text="/start")],
         [KeyboardButton(text="/myself")],
         [KeyboardButton(text="/register")],
-        [KeyboardButton(text="/pay")]
+        [KeyboardButton(text="/pay")],
+        [KeyboardButton(text="/callback")]
     ],
     resize_keyboard=True,
     input_field_placeholder="Выберите действие"

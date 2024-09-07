@@ -1,19 +1,31 @@
-from aiogram import Bot, types
+from yoomoney import Client, Quickpay
 from config_reader import config
-
-from aiogram.types import LabeledPrice
-
-PRICE = LabeledPrice(label="Подписка на 1 месяц", amount=10000)  # amount в копейках
+from datetime import datetime, timedelta
 
 
-async def initiate_payment(message: types.Message, bot: Bot):
-    await bot.send_invoice(
-        chat_id=message.chat.id,
-        title="Подписка на спикинг клуб",
-        description="Оплатите подписку на спикинг клуб на 1 месяц.",
-        payload="subscription_payment",  # Payload для обработки платежа
-        provider_token=config.payments_token.get_secret_value(),
-        start_parameter="subscribe",
-        currency="RUB",
-        prices=[PRICE]
+client = Client(config.yoomoney_token.get_secret_value())
+
+
+def generate_yoomoney_link(amount, username):
+    quickpay = Quickpay(
+        receiver=client.account_info().account,
+        quickpay_form="shop",
+        targets="Оплата посещения на спикинг клуб",
+        paymentType="SB",
+        sum=amount,
+        label=username,
+        successURL="http://site.ru"
     )
+    return quickpay.base_url
+
+
+def check_payment_status(username):
+    history = client.operation_history(label=username)
+    now = datetime.now()
+
+    for operation in history.operations:
+        if operation.label == username and operation.status == "success":
+            operation_time = operation.datetime.replace(tzinfo=None)
+            if now - operation_time < timedelta(days=1):
+                return True
+    return False
