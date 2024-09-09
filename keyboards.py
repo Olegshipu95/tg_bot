@@ -1,5 +1,5 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from enums import EnglishLevel
+from enums import EnglishLevel, Confirmation
 
 contact_keyboard = ReplyKeyboardMarkup(
     keyboard=[
@@ -11,8 +11,8 @@ contact_keyboard = ReplyKeyboardMarkup(
 
 confirmation_keyboard = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Да, перезаписать")],
-        [KeyboardButton(text="Нет, оставить старые данные")]
+        [KeyboardButton(text=Confirmation.YES)],
+        [KeyboardButton(text=Confirmation.NO)]
     ],
     resize_keyboard=True,
     one_time_keyboard=True
